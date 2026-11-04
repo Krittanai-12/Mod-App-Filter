@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { Mascot } from '@/components/mascot';
+import Link from 'next/link';
+import { RequireMockSession, useMockAuth } from '@/components/mock-auth';
 import { entityLabels, redact, sampleText, type EntityType, type Finding, type MaskMode } from '@/lib/redact';
 
 type Page = 'workspace'|'history'|'policies'|'api'|'settings';
@@ -21,7 +23,10 @@ const entities: {type:EntityType;icon:LucideIcon;color:string;hint:string}[] = [
 ];
 const nav: {id:Page;label:string;icon:LucideIcon}[]=[{id:'workspace',label:'พื้นที่ปกปิดข้อมูล',icon:ScanLine},{id:'history',label:'ประวัติการใช้งาน',icon:History},{id:'policies',label:'นโยบายการปกปิด',icon:ShieldCheck},{id:'api',label:'API & การเชื่อมต่อ',icon:Code2}];
 
-export default function Home(){
+export default function Home(){ return <RequireMockSession><Workspace/></RequireMockSession>; }
+
+function Workspace(){
+ const {user,logout}=useMockAuth();
  const [page,setPage]=useState<Page>('workspace'); const [tab,setTab]=useState<'text'|'file'>('text');
  const [input,setInput]=useState(sampleText); const [result,setResult]=useState<{text:string;findings:Finding[];source:string}|null>(null);
  const [focusMode,setFocusMode]=useState(false); const [demoMasked,setDemoMasked]=useState(true); const [resultView,setResultView]=useState<'masked'|'compare'>('masked');
@@ -50,9 +55,10 @@ export default function Home(){
    <nav>{nav.map(item=><button key={item.id} className={`nav-item ${page===item.id?'active':''}`} onClick={()=>navigate(item.id)}><item.icon size={19}/><span>{item.label}</span>{item.id==='workspace'?<span className="nav-count">01</span>:item.id==='api'?<span className="tiny-beta">BETA</span>:null}</button>)}</nav>
    <div className="nav-caption second-caption">MANAGEMENT</div>
    <button className={`nav-item ${page==='settings'?'active':''}`} onClick={()=>navigate('settings')}><Settings2 size={19}/><span>ตั้งค่าพื้นที่ทำงาน</span></button>
+   {user?.role==='admin'&&<Link className="nav-item admin-nav-link" href="/admin"><ShieldCheck size={19}/><span>Admin console</span><ArrowUpRight size={14}/></Link>}
    <div className="sidebar-bottom"><div className="privacy-card"><span className="small-shield"><ShieldCheck size={20}/></span><b>ตัวเล็ก แต่ปกป้องเต็มที่</b><p>มีน้องมดช่วยดูแลข้อมูล<br/>ก่อนส่งต่อในทุกเวิร์กโฟลว์</p><button onClick={()=>setHelp(true)}>มารู้จักกัน <ArrowUpRight size={14}/></button><div className="privacy-orbit"/><span className="sidebar-mascot"><Mascot/></span></div>
    <button className="help-link" onClick={()=>setHelp(true)}><CircleHelp size={18}/>ศูนย์ช่วยเหลือ<ArrowUpRight size={14}/></button>
-   <button className="profile" onClick={()=>navigate('settings')}><span className="profile-avatar">AP</span><span><b>Admin Preview</b><small>พื้นที่ทำงานตัวอย่าง</small></span><MoreHorizontal size={18}/></button></div>
+   <div className="session-profile"><button className="profile" onClick={()=>navigate('settings')}><span className="profile-avatar">{user?.role==='admin'?'AD':'MD'}</span><span><b>{user?.name}</b><small>{user?.role==='admin'?'ผู้ดูแลระบบ · Mock session':'ผู้ใช้งาน · Mock session'}</small></span></button><button className="session-logout" onClick={logout} aria-label="ออกจากระบบ" title="ออกจากระบบ"><ArrowRight size={16}/></button></div></div>
   </aside>
   <div className="main-shell">
    <header className="topbar"><div className="breadcrumb"><button className="mobile-menu icon-button" aria-label="เปิดเมนู" onClick={()=>setMobile(true)}><Menu size={20}/></button><span>Workspace</span><ChevronRight size={13}/><b>{page==='settings'?'ตั้งค่าพื้นที่ทำงาน':nav.find(n=>n.id===page)?.label}</b></div><div className="topbar-right">{page==='workspace'&&<button className={`focus-toggle ${focusMode?'enabled':''}`} aria-pressed={focusMode} onClick={()=>setFocusMode(!focusMode)}><ScanLine size={15}/><span>โหมดโฟกัส</span><kbd>ON</kbd></button>}<span className="demo-pill"><span/>UI Preview</span><span className="topbar-divider"/><button className="icon-button notification" aria-label="การแจ้งเตือน" onClick={()=>setNotifications(!notifications)}><Bell size={18}/><i/></button><span className="top-avatar">AP</span></div>{notifications&&<div className="notification-popover"><b>น้องมดพร้อมช่วยแล้ว!</b><p>นี่คือเวอร์ชันทดลอง UI ข้อมูลประมวลผลในเบราว์เซอร์ ประวัติจะหายเมื่อรีเฟรชหน้า</p><Button variant="ghost" size="sm" onClick={()=>setNotifications(false)}>รับทราบ <Check size={14}/></Button></div>}</header>
