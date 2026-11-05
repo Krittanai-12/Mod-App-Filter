@@ -415,3 +415,48 @@
     transform: rotate(360deg);
   }
 }
+
+@keyframes auth-lightDrift {
+  from {
+    translate: -30px -20px;
+  }
+  to {
+    translate: 60px 50px;
+  }
+}
+@keyframes auth-particleDrift {
+  0%,
+  100% {
+    translate: 0 12px;
+    opacity: 0.2;
+  }
+  50% {
+    translate: 18px -28px;
+    opacity: 0.8;
+  }
+}
+@keyframes auth-tileFloat {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 8px -18px;
+  }
+}
+@keyframes auth-lightFlow {
+  to {
+    stroke-dashoffset: -392;
+  }
+}
+@keyframes auth-edgeGlow {
+  0%,
+  100% {
+    opacity: 0.35;
+    scale: 0.8 1;
+  }
+  50% {
+    opacity: 1;
+    scale: 1 1;
+  }
+}

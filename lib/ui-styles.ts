@@ -99,11 +99,15 @@ const recipes: Record<string, string> = {
     '[&>span]:[background:#efa16b]',
   ].join(' '),
   'hero-banner':
-    'relative isolate flex min-h-[280px] overflow-hidden rounded-[20px] border border-[#D7E6F6] bg-[linear-gradient(160deg,#CFE7FF_0%,#EAF5FF_45%,#B9DCFF_100%)] shadow-[0_8px_22px_rgba(14,62,125,0.055)] max-[651px]:min-h-0 max-[651px]:flex-col max-[651px]:rounded-[18px]',
+    'relative isolate flex min-h-[280px] overflow-hidden rounded-[20px] border border-[#D7E6F6] bg-[#EAF5FF] shadow-[0_8px_22px_rgba(14,62,125,0.055)] max-[651px]:min-h-0 max-[651px]:flex-col max-[651px]:rounded-[18px]',
+  'hero-background': 'pointer-events-none absolute inset-0 z-0',
+  'hero-background-image': 'object-cover object-[center_55%] max-[651px]:object-[65%_center]',
+  'hero-background-overlay':
+    'absolute inset-0 bg-[linear-gradient(90deg,rgba(238,247,255,0.96)_0%,rgba(238,247,255,0.9)_28%,rgba(238,247,255,0.55)_58%,rgba(238,247,255,0.12)_100%)] max-[651px]:bg-[linear-gradient(180deg,rgba(238,247,255,0.97)_0%,rgba(238,247,255,0.9)_48%,rgba(238,247,255,0.3)_100%)]',
   'hero-copy':
     'relative z-2 flex min-w-0 flex-1 flex-col justify-center px-8 py-6 max-[901px]:px-6 max-[651px]:px-5 max-[651px]:pt-5 max-[651px]:pb-2 [&_h2]:text-[32px] [&_h2]:leading-[1.3] [&_h2]:font-bold [&_h2]:tracking-[-0.6px] [&_h2]:text-foreground max-[901px]:[&_h2]:text-[28px] max-[651px]:[&_h2]:text-[24px] [&_h2_span]:block [&_h2_span]:text-primary [&_p]:mt-3 [&_p]:text-xs [&_p]:leading-[1.8] [&_p]:text-muted-foreground max-[651px]:[&_p]:mt-2 max-[651px]:[&_p]:text-[11px] max-[651px]:[&_p_br]:hidden',
   'hero-art':
-    'relative block w-[42%] min-w-[260px] self-stretch max-[651px]:h-[180px] max-[651px]:w-full max-[651px]:min-w-0',
+    'relative z-1 block w-[42%] min-w-[260px] self-stretch max-[651px]:h-[180px] max-[651px]:w-full max-[651px]:min-w-0',
   'art-spark': 'absolute text-[#df9c58]',
   'spark-one': 'top-14 left-5 text-[25px] max-[651px]:top-7 max-[651px]:left-5 max-[651px]:text-lg',
   'spark-two': 'right-3 bottom-14 text-base max-[651px]:right-3 max-[651px]:bottom-10',
@@ -714,7 +718,7 @@ const recipes: Record<string, string> = {
   'ring-two':
     '-bottom-2 -left-3 size-[254px] border-solid border-[#ebd8c0] max-[651px]:-bottom-2 max-[651px]:-left-1 max-[651px]:size-[182px]',
   'hero-mascot':
-    'absolute -bottom-px left-[14px] h-[250px] w-auto max-w-none origin-bottom mix-blend-multiply [animation:mascot-welcome_.8s_ease-out_backwards] transition-transform duration-300 max-[651px]:left-[10px] max-[651px]:h-[178px]',
+    'absolute -bottom-px left-[14px] h-[250px] w-auto max-w-none origin-bottom [animation:mascot-welcome_.8s_ease-out_backwards] transition-transform duration-300 max-[651px]:left-[10px] max-[651px]:h-[178px]',
   'mascot-speech':
     'absolute top-3 right-4 z-4 rounded-[10px_10px_10px_2px] border border-[#ead7bf] bg-[#fffaf2] px-2.5 py-2 text-[8px] text-[#a48a69] shadow-sm [transform:rotate(3deg)] [animation:float_6s_ease-in-out_infinite] [&>span]:mr-1 [&>span]:text-[#deaa61] max-[901px]:text-[7px] max-[651px]:top-0 max-[651px]:right-3 max-[651px]:px-2 max-[651px]:py-1.5',
   'live-demo-card':

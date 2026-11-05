@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -71,7 +72,17 @@ export default function WorkspaceHome() {
   return (
     <>
       <Card as="section" className={ui('hero-banner')}>
-        <div className={ui('hero-grid-pattern')} />
+        <div className={ui('hero-background')} aria-hidden="true">
+          <Image
+            src="/hero-office.png"
+            alt=""
+            fill
+            preload
+            sizes="100vw"
+            className={ui('hero-background-image')}
+          />
+          <div className={ui('hero-background-overlay')} />
+        </div>
         <div className={ui('hero-copy')}>
           <h2>
             เรื่องข้อมูลส่วนตัว
@@ -101,7 +112,14 @@ export default function WorkspaceHome() {
             <div className={ui('mascot-ring ring-one')} />
             <div className={ui('mascot-ring ring-two')} />
             <div className={ui('mascot-glow')} />
-            <Mascot priority className={ui('hero-mascot')} />
+            <Image
+              src="/mascot-ant-transparent.png"
+              alt="มาสคอตมด Mod App Filter พร้อมช่วยปกป้องข้อมูลของคุณ"
+              width={1122}
+              height={1402}
+              preload
+              className={ui('hero-mascot')}
+            />
           </div>
           <div className={ui('mascot-speech')}>
             <span>✦</span>ส่งต่องานได้ ส่งต่อความลับไม่ได้นะ!
