@@ -1,11 +1,26 @@
 'use client';
-
-import { useState, type FormEvent } from 'react';
-import Link from 'next/link';
-import { ArrowRight, CheckCheck, Eye, EyeOff, FlaskConical, LockKeyhole, Mail, ShieldCheck, Sparkles, UserRound, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+
+import { useState, type FormEvent, type PointerEvent } from 'react';
+import Link from 'next/link';
+import {
+  ArrowRight,
+  Check,
+  Eye,
+  EyeOff,
+  LoaderCircle,
+  LockKeyhole,
+  Mail,
+  ShieldCheck,
+  Sparkles,
+  Users,
+} from 'lucide-react';
 import { Mascot } from '@/components/mascot';
 import { useMockAuth, type MockRole } from '@/components/mock-auth';
+import styles from './login.styles';
 
 export default function LoginPage() {
   const { login, user } = useMockAuth();
@@ -13,31 +28,323 @@ export default function LoginPage() {
   const [email, setEmail] = useState('member@example.com');
   const [password, setPassword] = useState('demo1234');
   const [showPassword, setShowPassword] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [focusedField, setFocusedField] = useState<'email' | 'password' | null>(null);
+  const [greetingCount, setGreetingCount] = useState(0);
 
-  function selectRole(next: MockRole) { setRole(next); setEmail(next === 'admin' ? 'admin@example.com' : 'member@example.com'); setError(''); }
+  const mascotMessage = submitting
+    ? 'ไปกันเลย! น้องมดไปด้วยนะ'
+    : focusedField === 'password'
+      ? showPassword
+        ? 'ใช้รหัสผ่านจำลองเท่านั้นนะ'
+        : 'ความลับของคุณ น้องมดดูแลให้'
+      : focusedField === 'email'
+        ? 'ใส่อีเมล แล้วไปเริ่มงานกันเลย'
+        : greetingCount > 0
+          ? 'ไฮไฟว์! วันนี้ต้องเป็นวันที่ดีแน่'
+          : role === 'admin'
+            ? 'พร้อมแล้ว ไปดูแลทีมกัน!'
+            : 'สวัสดี! น้องมดพร้อมช่วยแล้ว';
+
+  function selectRole(next: MockRole) {
+    setRole(next);
+    setEmail(next === 'admin' ? 'admin@example.com' : 'member@example.com');
+    setError('');
+    setGreetingCount(0);
+  }
+
+  function moveGlow(event: PointerEvent<HTMLElement>) {
+    if (event.pointerType !== 'mouse') return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    event.currentTarget.style.setProperty('--glow-x', `${event.clientX - bounds.left}px`);
+    event.currentTarget.style.setProperty('--glow-y', `${event.clientY - bounds.top}px`);
+  }
+
+  function moveMascot(event: PointerEvent<HTMLDivElement>) {
+    if (event.pointerType !== 'mouse') return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width) * 2 - 1));
+    const y = Math.max(-1, Math.min(1, ((event.clientY - bounds.top) / bounds.height) * 2 - 1));
+    event.currentTarget.style.setProperty('--buddy-x', `${x * 5}px`);
+    event.currentTarget.style.setProperty('--buddy-y', `${y * 3}px`);
+  }
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (password.length < 6) { setError('กรอกรหัสผ่านจำลองอย่างน้อย 6 ตัวอักษร'); return; }
+    if (submitting) return;
+    if (password.length < 6) {
+      setError('กรอกรหัสผ่านจำลองอย่างน้อย 6 ตัวอักษร');
+      return;
+    }
     setError('');
+    setSubmitting(true);
     login(email, role);
   }
 
-  return <div className="login-page">
-    <section className="login-story">
-      <Link href="/login" className="brand login-brand"><span className="brand-symbol"><Mascot priority/></span><span>Mod App<span className="brand-second">Filter<span className="brand-dot">.</span></span></span></Link>
-      <div className="login-story-copy"><div className="login-eyebrow"><Sparkles size={14}/> YOUR LITTLE PRIVACY GUARDIAN</div><h1>เริ่มงานได้อย่างมั่นใจ<br/><span>เรื่องข้อมูล ให้น้องมดดูแล</span></h1><p>พื้นที่ปลอดภัยก่อนส่งต่อข้อมูล<br/>ให้คุณและทีมทำงานต่อได้อย่างเป็นส่วนตัว</p></div>
-      <div className="login-mascot-scene"><div className="login-orbit"/><div className="login-orbit outer"/><div className="login-mascot-base"/><Mascot priority className="login-mascot"/><div className="login-bubble"><ShieldCheck size={17}/><span>พร้อมปกป้องข้อมูลของทีมคุณ!</span></div><div className="login-float-chip"><CheckCheck size={17}/> Privacy starts with you.</div><span className="login-star">✦</span></div>
-      <div className="login-story-footer"><span><LockKeyhole size={13}/>ข้อมูลของคุณ อยู่ในการควบคุมของคุณ</span><span>MAF / 01</span></div>
-    </section>
-    <section className="login-form-side"><div className="login-top-note"><span>ORGANIZATION WORKSPACE</span><span className="mock-badge"><FlaskConical size={12}/> MOCKUP</span></div>
-      <div className="login-form-container"><span className="login-welcome-icon"><UserRound size={26}/></span><div className="eyebrow">WELCOME TO MOD APP FILTER</div><h2>ยินดีต้อนรับกลับมา<span> 👋</span></h2><p className="login-subtitle">เข้าสู่พื้นที่ทำงานของคุณ แล้วให้น้องมดช่วยจัดการต่อ</p>
-        <div className="login-role-picker" aria-label="เลือกบทบาทสำหรับทดลอง"><button type="button" aria-pressed={role === 'member'} className={role === 'member' ? 'selected' : ''} onClick={() => selectRole('member')}><Users size={17}/><span>ผู้ใช้งาน<small>พื้นที่ปกปิดข้อมูล</small></span>{role === 'member' && <span className="role-check">✓</span>}</button><button type="button" aria-pressed={role === 'admin'} className={role === 'admin' ? 'selected' : ''} onClick={() => selectRole('admin')}><ShieldCheck size={18}/><span>ผู้ดูแลระบบ<small>Admin console</small></span>{role === 'admin' && <span className="role-check">✓</span>}</button></div>
-        <form onSubmit={submit} className="login-form"><label htmlFor="login-email">อีเมลขององค์กร</label><div className="auth-field"><Mail size={17}/><input id="login-email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required maxLength={254} autoComplete="off"/></div><div className="password-label"><label htmlFor="login-password">รหัสผ่าน</label><span>ใช้รหัสผ่านจำลองเท่านั้น</span></div><div className="auth-field"><LockKeyhole size={17}/><input id="login-password" type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required minLength={6} maxLength={128} autoComplete="off" aria-describedby="mock-login-note"/><button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}>{showPassword ? <EyeOff size={17}/> : <Eye size={17}/>}</button></div>{error && <p className="form-error" role="alert">{error}</p>}<Button type="submit">เข้าสู่ระบบ{role === 'admin' ? ' Admin' : ''}<ArrowRight size={17}/></Button></form>
-        <div className="login-divider"><span/>หรือลองเข้าใช้งานได้ทันที<span/></div><div className="demo-login-buttons"><Button variant="outline" onClick={() => login('member@example.com', 'member')}><Users size={16}/>ทดลองเป็น User</Button><Button variant="outline" onClick={() => login('admin@example.com', 'admin')}><ShieldCheck size={16}/>ทดลองเป็น Admin</Button></div>
-        <div className="mock-login-note" id="mock-login-note"><FlaskConical size={18}/><p><b>คุณกำลังอยู่ในโหมดทดลอง</b>ใช้อีเมลและรหัสผ่านตัวอย่างที่กรอกไว้ได้เลย ระบบไม่ตรวจสอบหรือจัดเก็บรหัสผ่าน และยังไม่เชื่อม Supabase</p></div>
-        {user && <Link className="existing-session" href={user.role === 'admin' ? '/admin' : '/'}>คุณมีเซสชัน {user.name} อยู่แล้ว · กลับไปทำงาน <ArrowRight size={13}/></Link>}
-      </div><footer className="login-footer"><span>© Mod App Filter</span><span>Designed for privacy. Built for your team.</span></footer>
-    </section>
-  </div>;
+  return (
+    <main className={styles.page}>
+      <div className={styles.ambient} aria-hidden="true">
+        <div className={styles.orbBlue} />
+        <div className={styles.orbLilac} />
+        <div className={styles.dotGrid} />
+        <div className={styles.ambientOrbit} />
+      </div>
+
+      <div
+        className={styles.stage}
+        onPointerMove={moveMascot}
+        onPointerLeave={(event) => {
+          event.currentTarget.style.setProperty('--buddy-x', '0px');
+          event.currentTarget.style.setProperty('--buddy-y', '0px');
+        }}
+      >
+        <div className={styles.brand}>
+          <span>
+            Mod App Filter<span className={styles.brandDot}>.</span>
+          </span>
+        </div>
+
+        <div className={styles.cardWrap}>
+          <aside
+            className={styles.mascotScene}
+            data-private={focusedField === 'password'}
+            aria-label="น้องมด เพื่อนช่วยดูแลข้อมูล"
+          >
+            <div className={styles.mascotSpeech}>
+              <span>
+                <span className={styles.buddyDot} />
+                น้องมด <span className={styles.buddyTag}>YOUR PRIVACY BUDDY</span>
+              </span>
+              <p key={mascotMessage}>{mascotMessage}</p>
+            </div>
+            <div className={styles.mascotHalo} aria-hidden="true" />
+            <div className={styles.mascotOrbit} aria-hidden="true">
+              <span />
+            </div>
+            <div className={styles.mascotFloat}>
+              <Button
+                variant="unstyled"
+                type="button"
+                className={styles.mascotHello}
+                aria-label="ทักทายน้องมด"
+                onClick={() => setGreetingCount((count) => count + 1)}
+              >
+                <span
+                  key={greetingCount}
+                  className={greetingCount > 0 ? styles.mascotWave : styles.mascotPose}
+                >
+                  <Mascot priority className={styles.mascotImage} />
+                </span>
+              </Button>
+            </div>
+            <span className={styles.buddyShield} aria-hidden="true">
+              {focusedField === 'password' ? (
+                <LockKeyhole size={19} strokeWidth={1.8} />
+              ) : (
+                <ShieldCheck size={20} strokeWidth={1.8} />
+              )}
+            </span>
+            {greetingCount > 0 && (
+              <div key={greetingCount} className={styles.greetingSparkles} aria-hidden="true">
+                <span>✦</span>
+                <span>✧</span>
+                <span>✦</span>
+                <span>✧</span>
+              </div>
+            )}
+            <span className={styles.mascotCaption} aria-hidden="true">
+              <Sparkles size={11} />
+              แตะทักทายน้องมดได้เลย
+            </span>
+          </aside>
+          <div className={styles.floatingShield} aria-hidden="true">
+            <span>
+              <ShieldCheck size={26} strokeWidth={1.5} />
+            </span>
+            <small>Privacy, with a smile.</small>
+            <i>✦</i>
+          </div>
+          <span className={styles.sparkleOne} aria-hidden="true">
+            <Sparkles size={23} strokeWidth={1.3} />
+          </span>
+          <span className={styles.sparkleTwo} aria-hidden="true">
+            ✦
+          </span>
+          <span className={styles.floatingDot} aria-hidden="true" />
+
+          <Card
+            as="section"
+            className={styles.card}
+            onPointerMove={moveGlow}
+            aria-labelledby="login-heading"
+          >
+            <h1 id="login-heading" className={styles.srOnly}>
+              เข้าสู่ระบบ Mod App Filter
+            </h1>
+            <div
+              className={styles.rolePicker}
+              role="group"
+              aria-label="เลือกบทบาทสำหรับเข้าสู่ระบบทดลอง"
+            >
+              <span className={styles.roleIndicator} data-role={role} aria-hidden="true" />
+              <Button
+                variant="unstyled"
+                type="button"
+                aria-pressed={role === 'member'}
+                className={styles.roleButton}
+                disabled={submitting}
+                onClick={() => selectRole('member')}
+              >
+                <Users size={20} strokeWidth={1.8} aria-hidden="true" />
+                <span>
+                  ผู้ใช้งาน<small>พื้นที่ปกปิดข้อมูล</small>
+                </span>
+                <span className={styles.roleCheck} aria-hidden="true">
+                  <Check size={11} strokeWidth={2.5} />
+                </span>
+              </Button>
+              <Button
+                variant="unstyled"
+                type="button"
+                aria-pressed={role === 'admin'}
+                className={styles.roleButton}
+                disabled={submitting}
+                onClick={() => selectRole('admin')}
+              >
+                <ShieldCheck size={21} strokeWidth={1.8} aria-hidden="true" />
+                <span>
+                  ผู้ดูแลระบบ<small>Admin console</small>
+                </span>
+                <span className={styles.roleCheck} aria-hidden="true">
+                  <Check size={11} strokeWidth={2.5} />
+                </span>
+              </Button>
+            </div>
+
+            <form onSubmit={submit} className={styles.form} aria-busy={submitting}>
+              <div
+                className={styles.fieldGroup}
+                onFocus={() => setFocusedField('email')}
+                onBlur={() => setFocusedField(null)}
+              >
+                <Label unstyled htmlFor="login-email">
+                  อีเมลขององค์กร
+                </Label>
+                <div className={styles.field}>
+                  <Mail size={19} strokeWidth={1.8} aria-hidden="true" />
+                  <Input
+                    unstyled
+                    id="login-email"
+                    name="email"
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder="you@example.com"
+                    required
+                    maxLength={254}
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    disabled={submitting}
+                  />
+                  <span className={styles.fieldFocus} aria-hidden="true" />
+                </div>
+              </div>
+
+              <div
+                className={styles.fieldGroup}
+                onFocus={() => setFocusedField('password')}
+                onBlur={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget)) setFocusedField(null);
+                }}
+              >
+                <div className={styles.passwordLabel}>
+                  <Label unstyled htmlFor="login-password">
+                    รหัสผ่าน
+                  </Label>
+                  <span id="password-hint">ใช้รหัสผ่านตัวอย่างได้เลย</span>
+                </div>
+                <div className={styles.field}>
+                  <LockKeyhole size={19} strokeWidth={1.8} aria-hidden="true" />
+                  <Input
+                    unstyled
+                    id="login-password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    className={showPassword ? undefined : styles.hiddenPassword}
+                    value={password}
+                    onChange={(event) => {
+                      setPassword(event.target.value);
+                      setError('');
+                    }}
+                    required
+                    minLength={6}
+                    maxLength={128}
+                    autoComplete="off"
+                    aria-describedby={error ? 'password-hint login-error' : 'password-hint'}
+                    aria-invalid={!!error}
+                    disabled={submitting}
+                  />
+                  <Button
+                    variant="unstyled"
+                    type="button"
+                    className={styles.passwordToggle}
+                    onClick={() => setShowPassword((value) => !value)}
+                    aria-label={showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
+                    aria-pressed={showPassword}
+                    disabled={submitting}
+                  >
+                    {showPassword ? (
+                      <EyeOff size={19} strokeWidth={1.8} />
+                    ) : (
+                      <Eye size={19} strokeWidth={1.8} />
+                    )}
+                  </Button>
+                  <span className={styles.fieldFocus} aria-hidden="true" />
+                </div>
+              </div>
+
+              {error && (
+                <p id="login-error" className={styles.error} role="alert">
+                  {error}
+                </p>
+              )}
+              <Button
+                variant="unstyled"
+                type="submit"
+                className={styles.submit}
+                disabled={submitting}
+              >
+                <span>
+                  {submitting
+                    ? 'กำลังเปิดพื้นที่ทำงาน'
+                    : role === 'admin'
+                      ? 'เข้าสู่ระบบ Admin'
+                      : 'เข้าสู่ระบบ'}
+                </span>
+                {submitting ? (
+                  <LoaderCircle size={19} className={styles.spinner} aria-hidden="true" />
+                ) : (
+                  <ArrowRight size={20} className={styles.submitArrow} aria-hidden="true" />
+                )}
+              </Button>
+            </form>
+          </Card>
+        </div>
+
+        {user && (
+          <div className={styles.belowCard}>
+            <Link
+              className={styles.existingSession}
+              href={user.role === 'admin' ? '/admin' : '/home'}
+            >
+              กลับไปยังพื้นที่ทำงานของ {user.name}
+              <ArrowRight size={13} aria-hidden="true" />
+            </Link>
+          </div>
+        )}
+      </div>
+    </main>
+  );
 }
